@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @NoArgsConstructor
 @Setter
 @Getter
@@ -26,6 +29,8 @@ public class UserDto {
 
     @NotEmpty(message = "about should not be empty")
     private String about;
+
+    private Set<RoleDto> roles=new HashSet<>();
 
     public int getId() {
         return id;
@@ -67,5 +72,12 @@ public class UserDto {
         this.about = about;
     }
 
+    public Set<RoleDto> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<RoleDto> roles) {
+        this.roles = roles;
+    }
 }
 

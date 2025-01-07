@@ -1,12 +1,15 @@
 package com.samda.blog_app.services.impl;
 
+import com.samda.blog_app.entities.Role;
 import com.samda.blog_app.entities.User;
 import com.samda.blog_app.exceptions.ResourcesNotFoundException;
 import com.samda.blog_app.payloads.UserDto;
+import com.samda.blog_app.repositories.RoleRepo;
 import com.samda.blog_app.repositories.UserRepo;
 import com.samda.blog_app.services.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +23,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
+    RoleRepo roleRepo;
 
     @Override
     public UserDto createUser(UserDto userDto) {
@@ -59,6 +68,18 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Integer userId) {
         User user = userRepo.findById(userId).orElseThrow(() -> new ResourcesNotFoundException("User", "Id", userId));
         userRepo.delete(user);
+    }
+
+    @Override
+    public UserDto registerNewUser(UserDto userDto) {
+        User user = this.modelMapper.map(userDto, User.class);
+        user.setPassword(this.passwordEncoder.encode(user.getPassword()));
+        Role role = this.roleRepo.findById(502).get();
+
+        user.getRoles().add(role);
+
+        User newUser = this.userRepo.save(user);
+        return this.modelMapper.map(newUser, UserDto.class);
     }
 
     public User dtoToUser(UserDto userDto) {
